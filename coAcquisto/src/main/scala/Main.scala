@@ -53,10 +53,12 @@ object CoAcquisto {
     }
 
     def main(args: Array[String]): Unit = {
-        val filePath = "gs://bucket_test_fusillo/order_products.csv"
+        val bucket_name = "co-purchase-bucket"
+
+        val filePath = "gs://" + bucket_name + "/order_products.csv"
         // val filePath = "./src/order_products.csv" // Percorso del file di input // ===== DATAPROC =====
 
-        val outputPath = "gs://bucket_test_fusillo/output" // Directory di output per il CSV
+        val outputPath = "gs://" + bucket_name + "/output" // Directory di output per il CSV
         // val outputPath = "./output" // Directory di output per il CSV // ===== DATAPROC =====
 
         // Cancella la directory di output se già esiste

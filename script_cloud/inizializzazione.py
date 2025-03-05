@@ -1,5 +1,7 @@
 from google.cloud import storage
 
+bucket_name = "co-purchase-bucket"
+
 # creazione del bucket
 def create_bucket(bucket_name, location="EU"):
     storage_client = storage.Client()
@@ -17,9 +19,9 @@ def upload_file(bucket_name, source_file_path, destination_blob_name):
     print(f"File {source_file_path} caticato in {destination_blob_name}.")
 
 
-create_bucket("bucket_test_fusillo")
+create_bucket(bucket_name)
 
-upload_file("bucket_test_fusillo", "./order_products_edit.csv", "order_products.csv")
-upload_file("bucket_test_fusillo", "./progettoesame_2.12-0.1.0-SNAPSHOT.jar", "ProgettoEsame.jar")
+upload_file(bucket_name, "../order_products_edit.csv", "order_products.csv")
+upload_file(bucket_name, "../progettoesame_2.12-0.1.0-SNAPSHOT.jar", "ProgettoEsame.jar")
 
 print("creazione del bucket completata")

@@ -1,6 +1,6 @@
 ## Link utili
 
-### Bukets
+### Buckets
 https://console.cloud.google.com/storage/browser?hl=it&inv=1&invt=AbqQqQ&project=progettoscalable-451511&prefix=&forceOnBucketsSortingFiltering=true
 
 ### Dataproc
@@ -25,9 +25,32 @@ gcloud dataproc clusters delete <nome> --region <regione>
 
 
 ## Steps esecuzione codice
-1) installare -> pip install google-cloud-storage
-2) installare -> gcloud
-3) gcloud auth application-default login
+1) installare &rarr; gcloud
+2) inizializzare gcloud &rarr; gcloud init
 
+3) gcloud auth login <!-- evitabile? -->
+
+<!-- evitabile?  vvv -->
+4) creazione venv &rarr; python -m venv myvenv
+5) attivazione venv &rarr; source myvenv/venv/activate
+6) installare &rarr; pip install google-cloud-storage
+<!-- evitabile?  ^^^ -->
+
+7) eseguire lo script pyton per la creazione dei bucket
+    ``` 
+        pyhton  script_cloud/inizializzazione.py
+
+    ```
+8) eseguire lo script pyton per l'esecuzione dei cluster
+
+    ```
+        pyhton  script_cloud/master.py
+    ```
+
+9) eseguire lo script pyton per eliminare i bucket
+
+    ```
+        pyhton  script_cloud/master.py
+    ```
 
 gs://bucket_test_fusillo/order_products.csv
