@@ -3,31 +3,6 @@ import org.apache.spark.SparkContext
 import org.apache.spark.SparkConf
 import scala.io.Source
 
-// object WordCount {
-//   def main(args: Array[String]): Unit = {
-//     // Creazione della sessione Spark
-//     val spark = SparkSession.builder()
-//       .appName("Name Count Example")
-//       .master("local[*]") // Usa tutte le CPU disponibili
-//       .getOrCreate()
-
-//     // Leggi un file CSV con una colonna "name"
-//     val filePath = "./src/names.csv" // Sostituisci con il tuo percorso
-//     val data = spark.read.option("header", "true").csv(filePath)
-
-//     // Conta le occorrenze di ogni nome
-//     val nameCounts = data.groupBy("name")
-//       .agg(F.count("name").as("count"))
-//       .orderBy(F.desc("count"))
-
-//     // Mostra i risultati
-//     nameCounts.show()
-
-//     // Chiudi la sessione Spark
-//     spark.stop()
-//   }
-// }
-
 import org.apache.spark.{SparkConf, SparkContext}
 import java.nio.file.{Files, Paths, Path}
 import scala.util.Try
@@ -37,38 +12,29 @@ import scala.util.Try
 import org.apache.spark.{HashPartitioner, SparkConf, SparkContext}
 
 object CoAcquisto {
-    // Metodo per cancellare la directory di output se esiste
-    def deleteDirectory(directory: String): Unit = {
-        val path = Paths.get(directory)
-        if (Files.exists(path)) {
-            Try {
-                Files.walk(path)
-                    .sorted(java.util.Comparator.reverseOrder())
-                    .forEach(Files.delete)
-            }.recover {
-                case e: Exception =>
-                    println(s"Errore durante la cancellazione della directory $directory: ${e.getMessage}")
-            }
-        }
-    }
+
 
     def main(args: Array[String]): Unit = {
-        val bucket_name = "co-purchase-bucket"
-
-        val filePath = "gs://" + bucket_name + "/order_products.csv"
-        // val filePath = "./src/order_products.csv" // Percorso del file di input // ===== DATAPROC =====
-
-        val outputPath = "gs://" + bucket_name + "/output" // Directory di output per il CSV
-        // val outputPath = "./output" // Directory di output per il CSV // ===== DATAPROC =====
-
-        // Cancella la directory di output se già esiste
-        deleteDirectory(outputPath)
-
-        // Configurazione Spark per utilizzare tutti i core disponibili
+        //creazione spark context
         val conf = new SparkConf()
             .setAppName("CoAcquisto")
-            // .setMaster("local[*]") // Utilizza tutti i core disponibili // ===== DATAPROC =====
         val sc = new SparkContext(conf)
+
+        val executorsNumber = sc.getConf.get("spark.executor.instances")
+        val coreNumber = java.lang.Runtime.getRuntime.availableProcessors
+
+        println("============================")
+        println(s"info macchina |instances: $executorsNumber core: $coreNumber|")
+        println("============================")
+
+        val bucket_name = "co-purchase-bucket"
+
+        // Percorso del file di input
+        val filePath = "gs://" + bucket_name + "/order_products.csv"
+
+        // Directory di output per il CSV
+        val outputPath = "gs://" + bucket_name + "/outputs/output_" + executorsNumber
+
 
         // Misura il tempo di inizio
         val startTime = System.currentTimeMillis()
@@ -93,14 +59,18 @@ object CoAcquisto {
                 })
             }
 
-        val coAcquistiPart = coAcquisti.partitionBy(new HashPartitioner(200))
+        val coAcquistiPart = coAcquisti.partitionBy(new HashPartitioner(executorsNumber.toInt * coreNumber.toInt * 3))
 
         // Sommare il numero di ordini in cui ogni coppia appare
         val coAcquistiCounts = coAcquistiPart
-            .reduceByKey(_ + _)    
+            .reduceByKey(_ + _)   
 
-        val coMax = coAcquistiCounts.max()(Ordering.by(_._2))
-        println("Max conf" + coMax)
+        println("============================")
+        println("CALCOLO EFFETTUATO")
+        println("============================")
+
+        // val coMax = coAcquistiCounts.max()(Ordering.by(_._2))
+        // println("Max conf" + coMax)
 
         // Formattare il risultato come righe CSV (x, y, n)
         val csvOutput = coAcquistiCounts.map {
@@ -108,14 +78,16 @@ object CoAcquisto {
         }
 
         // Salvare il risultato in un file CSV
-        csvOutput.saveAsTextFile(outputPath)
+        csvOutput.repartition(1).saveAsTextFile(outputPath)
 
         // Misura il tempo di fine
         val endTime = System.currentTimeMillis()
         val elapsedTime = (endTime - startTime) / 1000.0 // Tempo in secondi
 
         // Stampa il tempo totale
-        println(s"Tempo totale di esecuzione: $elapsedTime secondi")
+        println("============================")
+        println(s"TEMPO TOTALE: $elapsedTime secondi")
+        println("============================")
 
         // Ferma il contesto Spark
         sc.stop()

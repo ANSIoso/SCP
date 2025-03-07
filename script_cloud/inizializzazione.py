@@ -21,7 +21,7 @@ def upload_file(bucket_name, source_file_path, destination_blob_name):
 
 create_bucket(bucket_name)
 
-upload_file(bucket_name, "../order_products_edit.csv", "order_products.csv")
-upload_file(bucket_name, "../progettoesame_2.12-0.1.0-SNAPSHOT.jar", "ProgettoEsame.jar")
+upload_file(bucket_name, "../order_products.csv", "order_products.csv")
+upload_file(bucket_name, "../ProgettoEsame.jar", "ProgettoEsame.jar")
 
 print("creazione del bucket completata")
