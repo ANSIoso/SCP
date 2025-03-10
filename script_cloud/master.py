@@ -1,7 +1,7 @@
 import subprocess
 
 nomeCluster = "prova"
-region = "europe-central2"
+region = "europe-west1"
 bucket_name = "co-purchase-bucket"
 
 def crea(singolo):
@@ -11,18 +11,20 @@ def crea(singolo):
         subprocess.run([
             "gcloud", "dataproc", "clusters", "create", nomeCluster, 
             "--region", region,
+            "--zone", "europe-west1-b",
             "--single-node", 
-            "--master-boot-disk-size", "240",
-            "--master-machine-type", "n2-standard-2"
+            "--master-boot-disk-size", "340",
+            "--master-machine-type", "n2-standard-4",
             ])
     else:
         subprocess.run([
             "gcloud", "dataproc", "clusters", "create", nomeCluster,
             "--region", region,
+            "--zone", "europe-west1-b",
             "--num-workers", str(2),
-            "--master-boot-disk-size", "240",
-            "--worker-boot-disk-size", "240",
-            "--master-machine-type", "n2-standard-2",
+            "--master-boot-disk-size", "100",
+            "--worker-boot-disk-size", "100",
+            "--master-machine-type", "n2-standard-4",
             "--worker-machine-type", "n2-standard-2"
         ])
 
@@ -34,13 +36,13 @@ def ingrandisci(workers):
     ])
 
 
-def start(workers, ramD, ramE, cores):
+def start(ramD, ramE, workers, cores):
     subprocess.run([
         "gcloud", "dataproc", "jobs", "submit", "spark",
         "--cluster", nomeCluster,
         "--region", region,
         "--jar", f"gs://{bucket_name}/ProgettoEsame.jar",
-        "--properties", f"spark.driver.memory={ramD}g,spark.executor.memory={ramE}g,spark.executor.instances={workers},spark.executor.cores={cores}"
+        "--properties", f"spark.executor.instances={workers},spark.driver.memory={ramD}g,spark.executor.memory={ramE}g,spark.executor.cores={cores}"
     ])
 
 def pulisci():
@@ -50,48 +52,48 @@ def pulisci():
 # ===========================================================================================================
 
 # ================================ RUN CON UN NODO ================================
-print(f"---- Creazione del cluster con 1 worker ----")
+# print(f"---- Creazione del cluster con 1 worker ----")
 
-# CREAZIONE
-crea(True)
+# # CREAZIONE
+# crea(True)
 
-# RUN
-start(1, 6, 5, 2)
+# # RUN
+# start(6, 4, 1, 2)
 
-# PULIZIA
-pulisci()
+# # PULIZIA
+# pulisci()
 
 # ================================ RUN CON DUE NODI ================================
 
-print(f"---- Creazione del cluster con 2 worker ----")
+# print(f"---- Creazione del cluster con 2 worker ----")
 
-# CREAZIONE
-crea(False)
+# # CREAZIONE
+# crea(False)
 
-# RUN
-start(2, 5, 4, 2)
+# # RUN
+# start(4, 4, 2, 2)
 
 # ================================ RUN CON TRE NODI ================================
 
-new_num_workers = 2
-print(f"---- Aggiornamento del cluster {nomeCluster}: aumento dei worker a {new_num_workers} ----")
+# new_num_workers = 3
+# print(f"---- Aggiornamento del cluster {nomeCluster}: aumento dei worker a {new_num_workers} ----")
 
-# AGGIORNAMENTO CLUSTER (AUMENTO NODI)
-ingrandisci(new_num_workers)
+# # AGGIORNAMENTO CLUSTER (AUMENTO NODI)
+# ingrandisci(new_num_workers)
 
-# RUN
-start(3, 4, 2, 2)
+# # RUN
+# start(4, 4, 3, 2)
 
 # # ================================ RUN CON QUATRO NODI ================================
 
-new_num_workers = 3
+new_num_workers = 4
 print(f"---- Aggiornamento del cluster {nomeCluster}: aumento dei worker a {new_num_workers} ----")
 
 # AGGIORNAMENTO CLUSTER (AUMENTO NODI)
 ingrandisci(new_num_workers)
 
 # RUN
-start(4, 2, 2, 2)
+start(4, 4, 4, 2)
 
 # PULIZIA
 pulisci()
