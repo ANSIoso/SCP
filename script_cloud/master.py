@@ -52,37 +52,37 @@ def pulisci():
 # ===========================================================================================================
 
 # ================================ RUN CON UN NODO ================================
-# print(f"---- Creazione del cluster con 1 worker ----")
+print(f"---- Creazione del cluster con 1 worker ----")
 
-# # CREAZIONE
-# crea(True)
+# CREAZIONE
+crea(True)
 
-# # RUN
-# start(6, 4, 1, 2)
+# RUN
+start(6, 4, 1, 2)
 
-# # PULIZIA
-# pulisci()
+# PULIZIA
+pulisci()
 
 # ================================ RUN CON DUE NODI ================================
 
-# print(f"---- Creazione del cluster con 2 worker ----")
+print(f"---- Creazione del cluster con 2 worker ----")
 
-# # CREAZIONE
-# crea(False)
+# CREAZIONE
+crea(False)
 
-# # RUN
-# start(4, 4, 2, 2)
+# RUN
+start(4, 4, 2, 2)
 
 # ================================ RUN CON TRE NODI ================================
 
-# new_num_workers = 3
-# print(f"---- Aggiornamento del cluster {nomeCluster}: aumento dei worker a {new_num_workers} ----")
+new_num_workers = 3
+print(f"---- Aggiornamento del cluster {nomeCluster}: aumento dei worker a {new_num_workers} ----")
 
-# # AGGIORNAMENTO CLUSTER (AUMENTO NODI)
-# ingrandisci(new_num_workers)
+# AGGIORNAMENTO CLUSTER (AUMENTO NODI)
+ingrandisci(new_num_workers)
 
-# # RUN
-# start(4, 4, 3, 2)
+# RUN
+start(4, 4, 3, 2)
 
 # # ================================ RUN CON QUATRO NODI ================================
 
