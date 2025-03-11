@@ -97,17 +97,17 @@
 
 
 
-import org.apache.spark.sql.{SparkSession, functions => F}
-import org.apache.spark.SparkContext
-import org.apache.spark.SparkConf
-import scala.io.Source
+// import org.apache.spark.sql.{SparkSession, functions => F}
+// import org.apache.spark.SparkContext
+// import org.apache.spark.SparkConf
+// import scala.io.Source
 
-import org.apache.spark.{SparkConf, SparkContext}
-import java.nio.file.{Files, Paths, Path}
-import scala.util.Try
+// import org.apache.spark.{SparkConf, SparkContext}
+// import java.nio.file.{Files, Paths, Path}
+// import scala.util.Try
 
-import java.nio.file.{Files, Paths}
-import scala.util.Try
+// import java.nio.file.{Files, Paths}
+// import scala.util.Try
 import org.apache.spark.{HashPartitioner, SparkConf, SparkContext}
 
 object CoAcquisto {
@@ -153,12 +153,12 @@ object CoAcquisto {
             .groupByKey()
 
         // Generare tutte le combinazioni di co-acquisti per ogni ordine
-        val coAcquisti = productsByOrder
-            .flatMap { case (_, products) =>
-                products.toSet.subsets(2).map(_.toList match {
-                    case List(p1, p2) => ((p1, p2), 1)
-                })
+        val coAcquisti = productsByOrder.flatMap { case (_, products) =>
+            products.toSet.subsets(2).map { subset =>
+                val pair = subset.toList.sorted
+                ((pair(0), pair(1)), 1)
             }
+        }
 
         // Sommare il numero di ordini in cui ogni coppia appare
         val coAcquistiCounts = coAcquisti
@@ -169,8 +169,12 @@ object CoAcquisto {
         println("CALCOLO EFFETTUATO")
         println("============================")
 
-        // val coMax = coAcquistiCounts.max()(Ordering.by(_._2))
-        // println("Max conf" + coMax)
+        // // Calcola il top 5 delle coppie di co-acquisti (in base al conteggio)
+        // val top5 = coAcquistiCounts.top(5)(Ordering.by(_._2))
+        // println("Top 5 co-acquisti:")
+        // top5.foreach { case ((p1, p2), count) =>
+        //     println(s"($p1, $p2): $count")
+        // }
 
         // Formattare il risultato come righe CSV (x, y, n)
         val csvOutput = coAcquistiCounts.map {
