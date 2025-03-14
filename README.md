@@ -35,7 +35,7 @@ https://console.cloud.google.com/billing/credits
         pyhton  script_cloud/master.py
     ```
 
-9) eseguire lo script pyton per eliminare i bucket
+9) eseguire lo script pyton per eliminare i bucket (attenzione eliminerà TUTTI i bucket)
 
     ```
         pyhton  script_cloud/master.py
